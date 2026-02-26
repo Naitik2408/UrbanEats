@@ -1,0 +1,118 @@
+spring:
+  application:
+    name: urbaneats
+
+  profiles:
+    active: ${SPRING_PROFILE:local}
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:urbaneats}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+
+  jpa:
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: ${REDIS_TIMEOUT:60000}
+      lettuce:
+        pool:
+          max-active: ${REDIS_POOL_MAX_ACTIVE:8}
+          max-idle: ${REDIS_POOL_MAX_IDLE:8}
+          min-idle: ${REDIS_POOL_MIN_IDLE:0}
+
+    elasticsearch:
+      repositories:
+        enabled: true
+
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+    username: ${ELASTICSEARCH_USERNAME:}
+    password: ${ELASTICSEARCH_PASSWORD:}
+    connection-timeout: ${ELASTICSEARCH_CONNECTION_TIMEOUT:5s}
+    socket-timeout: ${ELASTICSEARCH_SOCKET_TIMEOUT:30s}
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+    include-exception: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.urbaneats: ${LOG_LEVEL_APP:DEBUG}
+    org.springframework.web: ${LOG_LEVEL_SPRING_WEB:INFO}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
+    org.hibernate: ${LOG_LEVEL_HIBERNATE:WARN}
+
+---
+# Local Profile
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    com.urbaneats: DEBUG
+
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    root: WARN
+    com.urbaneats: INFO

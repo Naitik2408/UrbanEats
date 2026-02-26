@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "java-spring-boot": {
+      "source": "pluginagentmarketplace/custom-plugin-java",
+      "sourceType": "github",
+      "computedHash": "93e5a124d8d5f29e0b19692d431452f8b6c2a2e1c3e05c0f93f07fb2473ab32a"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "computedHash": "e688fcd4c5693e14ebd00d48e982dbd2be060fbea89f5f60531e79c704a1bc28"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "4365be772fd3b41994a72ad478472c6d680678e7f3859860ab010e9c46e48ee0"
+    }
+  }
+}

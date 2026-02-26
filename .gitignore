@@ -60,4 +60,7 @@ application-*.yml
 !application-*.example.properties
 !application-*.example.yml
 
+# My files
 *.md
+.agents
+*.sh
