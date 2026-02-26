@@ -1,6 +1,7 @@
 package com.urbaneats.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -63,6 +64,22 @@ public class GlobalExceptionHandler {
         );
         problemDetail.setTitle("Invalid Request");
         problemDetail.setType(URI.create("https://urbaneats.com/errors/bad-request"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
+     * Handles DataIntegrityViolationException (database constraint violations).
+     * Returns 409 Conflict with problem details.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Data Integrity Violation");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/conflict"));
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
     }
