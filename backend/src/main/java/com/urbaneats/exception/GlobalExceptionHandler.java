@@ -118,6 +118,70 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles EmptyCartException.
+     * Returns 400 Bad Request when cart is empty during checkout.
+     */
+    @ExceptionHandler(EmptyCartException.class)
+    public ProblemDetail handleEmptyCartException(EmptyCartException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Empty Cart");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/empty-cart"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
+     * Handles InvalidVariantException.
+     * Returns 400 Bad Request when invalid variant is selected.
+     */
+    @ExceptionHandler(InvalidVariantException.class)
+    public ProblemDetail handleInvalidVariantException(InvalidVariantException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Invalid Variant");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/invalid-variant"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
+     * Handles InvalidAddonException.
+     * Returns 400 Bad Request when invalid addon is selected.
+     */
+    @ExceptionHandler(InvalidAddonException.class)
+    public ProblemDetail handleInvalidAddonException(InvalidAddonException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Invalid Addon");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/invalid-addon"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
+     * Handles CancellationWindowExpiredException.
+     * Returns 400 Bad Request when order cancellation window has expired.
+     */
+    @ExceptionHandler(CancellationWindowExpiredException.class)
+    public ProblemDetail handleCancellationWindowExpiredException(CancellationWindowExpiredException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Cancellation Window Expired");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/cancellation-expired"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
      * Handles validation errors from @Valid annotations.
      * Returns 400 Bad Request with field-level validation errors.
      */
