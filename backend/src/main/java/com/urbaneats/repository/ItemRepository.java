@@ -44,4 +44,18 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
      */
     @Query("SELECT i FROM Item i LEFT JOIN FETCH i.addons WHERE i.id = :itemId")
     Item findByIdWithAddons(@Param("itemId") Long itemId);
+
+    /**
+     * Find item by ID with both variants and addons loaded.
+     * Uses JOIN FETCH to load all related data in a single query.
+     * Optimized for customer detail view to avoid N+1 problem.
+     *
+     * @param itemId the item ID
+     * @return item with variants and addons, or null if not found
+     */
+    @Query("SELECT DISTINCT i FROM Item i " +
+           "LEFT JOIN FETCH i.variants " +
+           "LEFT JOIN FETCH i.addons " +
+           "WHERE i.id = :itemId")
+    Item findByIdWithVariantsAndAddons(@Param("itemId") Long itemId);
 }
