@@ -3,6 +3,7 @@ package com.urbaneats.exception;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,6 +32,71 @@ public class GlobalExceptionHandler {
         problemDetail.setTitle("Entity Not Found");
         problemDetail.setType(URI.create("https://urbaneats.com/errors/not-found"));
         problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
+     * Handles BadCredentialsException (authentication failures).
+     * Returns 401 Unauthorized with problem details.
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ProblemDetail handleBadCredentialsException(BadCredentialsException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Authentication Failed");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/unauthorized"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
+     * Handles IllegalArgumentException (validation errors).
+     * Returns 400 Bad Request with problem details.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ProblemDetail handleIllegalArgumentException(IllegalArgumentException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Invalid Request");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/bad-request"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
+     * Handles OtpAttemptsExceededException.
+     * Returns 429 Too Many Requests with problem details.
+     */
+    @ExceptionHandler(OtpAttemptsExceededException.class)
+    public ProblemDetail handleOtpAttemptsExceededException(OtpAttemptsExceededException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.TOO_MANY_REQUESTS,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Too Many Attempts");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/too-many-attempts"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    /**
+     * Handles OtpCooldownException.
+     * Returns 429 Too Many Requests with remaining cooldown time.
+     */
+    @ExceptionHandler(OtpCooldownException.class)
+    public ProblemDetail handleOtpCooldownException(OtpCooldownException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.TOO_MANY_REQUESTS,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("OTP Cooldown Active");
+        problemDetail.setType(URI.create("https://urbaneats.com/errors/otp-cooldown"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("remainingSeconds", ex.getRemainingSeconds());
         return problemDetail;
     }
 

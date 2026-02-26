@@ -63,6 +63,19 @@ server:
     include-stacktrace: never
     include-exception: false
 
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:urbanEatsSecretKeyForJWTTokenGenerationMinimum256BitsRequired}
+  expiration: ${JWT_EXPIRATION:86400000}  # 24 hours in milliseconds
+
+# OTP Configuration
+otp:
+  expiration: ${OTP_EXPIRATION:120}  # 2 minutes in seconds
+  length: ${OTP_LENGTH:6}
+  max-attempts: ${OTP_MAX_ATTEMPTS:5}  # Maximum verification attempts
+  cooldown: ${OTP_COOLDOWN:30}  # Cooldown period in seconds before resending
+  return-in-response: ${OTP_RETURN_IN_RESPONSE:true}  # Return OTP in response (dev only)
+
 management:
   endpoints:
     web:
@@ -111,6 +124,9 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: validate
+
+otp:
+  return-in-response: false  # Never return OTP in production
 
 logging:
   level:
