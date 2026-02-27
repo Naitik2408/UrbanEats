@@ -87,18 +87,18 @@ public class CartService {
         ItemVariant variant = null;
         if (item.getHasVariants()) {
             if (request.getVariantId() == null) {
-                throw new InvalidVariantException("Variant is required for item: " + item.getName());
+                throw new InvalidVariantException("Variant selection required for this item");
             }
             variant = itemVariantRepository.findById(request.getVariantId())
                     .orElseThrow(() -> new EntityNotFoundException("Variant not found with ID: " + request.getVariantId()));
             
             // Validate variant belongs to item
             if (!variant.getItem().getId().equals(item.getId())) {
-                throw new InvalidVariantException("Variant does not belong to item: " + item.getName());
+                throw new InvalidVariantException("Invalid variant for item: " + item.getName());
             }
         } else {
             if (request.getVariantId() != null) {
-                throw new InvalidVariantException("Item does not support variants: " + item.getName());
+                throw new InvalidVariantException("This item does not have variants");
             }
         }
 
@@ -106,7 +106,7 @@ public class CartService {
         List<ItemAddon> addons = new ArrayList<>();
         if (request.getAddonIds() != null && !request.getAddonIds().isEmpty()) {
             if (!item.getHasAddons()) {
-                throw new InvalidAddonException("Item does not support addons: " + item.getName());
+                throw new InvalidAddonException("Addons not allowed for this item");
             }
             
             addons = itemAddonRepository.findAllById(request.getAddonIds());

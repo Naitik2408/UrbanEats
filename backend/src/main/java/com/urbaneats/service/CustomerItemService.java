@@ -8,6 +8,7 @@ import com.urbaneats.repository.RestaurantRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class CustomerItemService {
      * @throws EntityNotFoundException if restaurant not found
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "items", key = "#restaurantId")
     public Page<ItemCustomerResponse> getItemsByRestaurant(Long restaurantId, Pageable pageable) {
         // Validate restaurant exists
         if (!restaurantRepository.existsById(restaurantId)) {

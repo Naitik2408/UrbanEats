@@ -7,6 +7,8 @@ import com.urbaneats.repository.CityRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ public class CityService {
      * @throws DataIntegrityViolationException if city name already exists
      */
     @Transactional
+    @CacheEvict(value = "cities", allEntries = true)
     public CityResponse createCity(CityRequest request) {
         // Check if city name already exists
         if (cityRepository.existsByName(request.getName())) {
@@ -60,6 +63,7 @@ public class CityService {
      * @throws DataIntegrityViolationException if new name already exists
      */
     @Transactional
+    @CacheEvict(value = "cities", allEntries = true)
     public CityResponse updateCity(Long id, CityRequest request) {
         City city = cityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("City not found with ID: " + id));
@@ -87,6 +91,7 @@ public class CityService {
      * @throws EntityNotFoundException if city not found
      */
     @Transactional
+    @CacheEvict(value = "cities", allEntries = true)
     public void deleteCity(Long id) {
         City city = cityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("City not found with ID: " + id));
@@ -105,6 +110,7 @@ public class CityService {
      * @return page of city responses
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "cities")
     public Page<CityResponse> getAllCities(Pageable pageable) {
         return cityRepository.findAll(pageable)
                 .map(this::mapToResponse);

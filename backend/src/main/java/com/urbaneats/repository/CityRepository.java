@@ -1,7 +1,11 @@
 package com.urbaneats.repository;
 
 import com.urbaneats.entity.City;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -29,4 +33,14 @@ public interface CityRepository extends JpaRepository<City, Long> {
      * @return true if exists
      */
     boolean existsByName(String name);
+
+    /**
+     * Search cities by name (case-insensitive, partial match).
+     * 
+     * @param keyword the search keyword
+     * @param pageable pagination parameters
+     * @return page of matching cities
+     */
+    @Query("SELECT c FROM City c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<City> searchCities(@Param("keyword") String keyword, Pageable pageable);
 }

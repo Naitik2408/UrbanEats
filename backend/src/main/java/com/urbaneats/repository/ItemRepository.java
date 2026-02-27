@@ -58,4 +58,14 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
            "LEFT JOIN FETCH i.addons " +
            "WHERE i.id = :itemId")
     Item findByIdWithVariantsAndAddons(@Param("itemId") Long itemId);
+
+    /**
+     * Search items by name (case-insensitive, partial match).
+     * 
+     * @param keyword the search keyword
+     * @param pageable pagination parameters
+     * @return page of matching items
+     */
+    @Query("SELECT i FROM Item i WHERE LOWER(i.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<Item> searchItems(@Param("keyword") String keyword, Pageable pageable);
 }

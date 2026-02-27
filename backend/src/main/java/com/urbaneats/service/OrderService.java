@@ -121,6 +121,7 @@ public class OrderService {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setItemName(item.getName());
+            orderItem.setRestaurantName(item.getRestaurant().getName()); // Snapshot restaurant name
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setSubtotal(subtotal);
 
@@ -210,9 +211,9 @@ public class OrderService {
     public Page<OrderResponse> getOrdersByUser(Long userId, Pageable pageable) {
         log.info("Fetching orders - userId: {}", userId);
 
-        Page<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+        Page<Order> orders = orderRepository.findByUserIdWithItems(userId, pageable);
 
-        return orders.map(this::mapToOrderResponse);
+        return orders.map(this::mapToOrderResponseWithItems);
     }
 
     /**
@@ -232,8 +233,13 @@ public class OrderService {
      * Map Order entity to OrderResponse DTO (without items).
      */
     private OrderResponse mapToOrderResponse(Order order) {
+        // Get restaurant name from first order item if available
+        String restaurantName = order.getItems().isEmpty() ? "Unknown" : 
+                order.getItems().get(0).getRestaurantName();
+        
         return OrderResponse.builder()
                 .orderId(order.getId())
+                .restaurantName(restaurantName)
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
                 .createdAt(order.getCreatedAt())
@@ -249,8 +255,13 @@ public class OrderService {
                 .map(this::mapToOrderItemDto)
                 .collect(Collectors.toList());
 
+        // Get restaurant name from first order item if available
+        String restaurantName = order.getItems().isEmpty() ? "Unknown" : 
+                order.getItems().get(0).getRestaurantName();
+
         return OrderResponse.builder()
                 .orderId(order.getId())
+                .restaurantName(restaurantName)
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
                 .createdAt(order.getCreatedAt())
