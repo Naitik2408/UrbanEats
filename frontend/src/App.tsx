@@ -1,13 +1,22 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from '@/pages/HomePage';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { QueryProvider } from './providers/QueryProvider';
+import { AppRouter } from './routes';
 
+/**
+ * Root App component.
+ * 
+ * Architecture:
+ * - ErrorBoundary: Catches and handles React errors
+ * - QueryProvider: Provides React Query context
+ * - AppRouter: Handles routing and navigation
+ */
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-      </Routes>
-    </Router>
+    <ErrorBoundary>
+      <QueryProvider>
+        <AppRouter />
+      </QueryProvider>
+    </ErrorBoundary>
   );
 }
 
