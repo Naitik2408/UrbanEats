@@ -31,14 +31,14 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
     @Override
     public ClientConfiguration clientConfiguration() {
-        ClientConfiguration.MaybeSecureClientConfigurationBuilder builder = ClientConfiguration.builder()
+        var builder = ClientConfiguration.builder()
                 .connectedTo(elasticsearchUris.replace("http://", "").replace("https://", ""))
                 .withConnectTimeout(parseDuration(connectionTimeout))
                 .withSocketTimeout(parseDuration(socketTimeout));
 
         // Add basic auth if credentials are provided
         if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
-            builder.withBasicAuth(username, password);
+            return builder.withBasicAuth(username, password).build();
         }
 
         return builder.build();
