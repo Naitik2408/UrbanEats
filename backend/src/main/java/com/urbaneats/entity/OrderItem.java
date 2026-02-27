@@ -48,6 +48,13 @@ public class OrderItem {
     private String itemName;
 
     /**
+     * SNAPSHOT: Restaurant name at the time of order.
+     * Stored to display in order history even if restaurant is deleted/renamed.
+     */
+    @Column(name = "restaurant_name", nullable = false, length = 200)
+    private String restaurantName;
+
+    /**
      * SNAPSHOT: Base price of item at the time of order.
      * If variant was selected, this will be 0 (variant price is used instead).
      * Precision: 10 digits total, 2 decimal places.

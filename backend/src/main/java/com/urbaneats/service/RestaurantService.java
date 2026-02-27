@@ -9,6 +9,7 @@ import com.urbaneats.repository.RestaurantRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class RestaurantService {
      * @throws EntityNotFoundException if city not found
      */
     @Transactional
+    @CacheEvict(value = "restaurants", allEntries = true)
     public RestaurantResponse createRestaurant(RestaurantRequest request) {
         // Validate city exists
         City city = cityRepository.findById(request.getCityId())
@@ -65,6 +67,7 @@ public class RestaurantService {
      * @throws EntityNotFoundException if restaurant or city not found
      */
     @Transactional
+    @CacheEvict(value = "restaurants", allEntries = true)
     public RestaurantResponse updateRestaurant(Long id, RestaurantRequest request) {
         Restaurant restaurant = restaurantRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Restaurant not found with ID: " + id));

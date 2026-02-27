@@ -13,6 +13,7 @@ import com.urbaneats.repository.RestaurantRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ public class ItemService {
      * @throws IllegalArgumentException if validation fails
      */
     @Transactional
+    @CacheEvict(value = "items", allEntries = true)
     public ItemResponse createItem(ItemRequest request) {
         // Validate restaurant exists
         Restaurant restaurant = restaurantRepository.findById(request.getRestaurantId())

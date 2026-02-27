@@ -20,8 +20,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     /**
      * Find orders by user ID with pagination.
      * Orders are sorted by creation date descending (newest first).
+     * Uses JOIN FETCH to avoid LazyInitializationException.
      */
-    Page<Order> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items WHERE o.user.id = :userId ORDER BY o.createdAt DESC")
+    Page<Order> findByUserIdWithItems(@Param("userId") Long userId, Pageable pageable);
 
     /**
      * Find order by ID with items eagerly loaded.

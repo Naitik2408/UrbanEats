@@ -21,6 +21,7 @@ import java.util.List;
 public class OrderResponse {
 
     private Long orderId;
+    private String restaurantName;
     private BigDecimal totalAmount;
     private Order.OrderStatus status;
     private LocalDateTime createdAt;
