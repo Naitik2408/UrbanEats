@@ -10,6 +10,22 @@ import axios, { type AxiosInstance, type AxiosError } from 'axios';
  * - Response interceptor for 401 handling
  */
 
+// Import will be used after store initialization
+let getAuthToken: (() => string | null) | null = null;
+let clearAuth: (() => void) | null = null;
+
+/**
+ * Set auth store hooks for interceptors
+ * Called after store is initialized
+ */
+export const setAuthHooks = (
+  getToken: () => string | null,
+  onLogout: () => void
+) => {
+  getAuthToken = getToken;
+  clearAuth = onLogout;
+};
+
 const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
   timeout: 10000, // 10 seconds
@@ -23,8 +39,8 @@ const apiClient: AxiosInstance = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // Get token from auth store (will be implemented in auth flow)
-    const token = localStorage.getItem('auth_token');
+    // Get token from auth store
+    const token = getAuthToken?.();
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -45,12 +61,11 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Clear auth state on 401
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_role');
+      clearAuth?.();
       
-      // Redirect to auth page (will be handled by router)
+      // Redirect to login
       if (typeof window !== 'undefined') {
-        window.location.href = '/auth';
+        window.location.href = '/auth/customer-login';
       }
     }
     

@@ -26,3 +26,25 @@ export interface HealthResponse {
   status: string;
   service: string;
 }
+
+/**
+ * Authentication types
+ */
+export interface OtpRequest {
+  phone: string;
+}
+
+export interface OtpVerifyRequest {
+  identifier: string;
+  otp: string;
+  firebaseToken?: string; // Optional: Firebase ID token for verification
+}
+
+export interface AdminLoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string;
+}

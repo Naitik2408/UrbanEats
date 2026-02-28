@@ -19,8 +19,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ children, className, variant = 'default', ...props }, ref) => {
     const variantStyles = {
       default: 'bg-white rounded-lg',
-      bordered: 'bg-white rounded-lg border border-gray-200',
-      elevated: 'bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow',
+      bordered: 'bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors duration-200',
+      elevated: 'bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-default',
     };
 
     return (

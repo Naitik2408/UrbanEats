@@ -76,6 +76,10 @@ otp:
   cooldown: ${OTP_COOLDOWN:30}  # Cooldown period in seconds before resending
   return-in-response: ${OTP_RETURN_IN_RESPONSE:true}  # Return OTP in response (dev only)
 
+# Firebase Configuration
+firebase:
+  service-account-path: ${FIREBASE_SERVICE_ACCOUNT_PATH:classpath:firebase-service-account.json}
+
 management:
   endpoints:
     web:

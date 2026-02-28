@@ -12,17 +12,17 @@ interface ProtectedRouteProps {
  * Features:
  * - Checks authentication status
  * - Validates user role against allowed roles
- * - Redirects unauthenticated users to /auth
- * - Redirects unauthorized users to /
+ * - Redirects unauthenticated users to appropriate login page
+ * - Redirects users to their role-specific dashboard if accessing wrong route
  */
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   allowedRoles = [],
 }) => {
   const { isAuthenticated, role } = useAuthStore();
 
-  // Not authenticated - redirect to auth page
+  // Not authenticated - redirect to customer login page
   if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/auth/customer-login" replace />;
   }
 
   // Authenticated but no role restrictions - allow access
@@ -35,6 +35,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Outlet />;
   }
 
-  // Authenticated but not authorized - redirect to home
+  // Authenticated but wrong role - redirect to appropriate dashboard
+  if (role === 'ADMIN') {
+    return <Navigate to="/admin" replace />;
+  }
+  if (role === 'CUSTOMER') {
+    return <Navigate to="/customer" replace />;
+  }
+
+  // Fallback to home page
   return <Navigate to="/" replace />;
 };

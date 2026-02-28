@@ -40,7 +40,29 @@ export default defineConfig({
           'vendor-query': ['@tanstack/react-query'],
           'vendor-state': ['zustand'],
         },
+        // Optimize asset naming for better caching
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
+    // Target modern browsers for better optimization
+    target: 'esnext',
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+    // Optimize dependencies
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
+  // Performance optimizations
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query', 'zustand', 'axios'],
+    exclude: ['firebase'],
+  },
+  // Preview server configuration
+  preview: {
+    port: 3000,
+    strictPort: true,
   },
 })

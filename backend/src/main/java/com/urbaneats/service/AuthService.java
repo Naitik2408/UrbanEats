@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final OtpService otpService;
+    private final FirebaseOtpService firebaseOtpService;
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
@@ -36,20 +37,32 @@ public class AuthService {
      */
     public OtpResponse generateOtp(OtpRequest request) {
         String identifier = request.getIdentifier();
-        String otp = otpService.generateAndStoreOtp(identifier);
         
-        // In production, send OTP via email/SMS service
-        // For development, OTP is returned in response
-        if (log.isInfoEnabled()) {
-            log.info("OTP generation requested for identifier: {}", identifier);
+        // Check if it's a phone number (use Firebase)
+        if (identifier.startsWith("+") || identifier.matches("^\\d{10,}$")) {
+            // Normalize phone to E.164 format if needed
+            String phone = identifier.startsWith("+") ? identifier : "+91" + identifier;
+            
+            // Generate OTP using Firebase
+            String otp = firebaseOtpService.generateOtp(phone);
+            
+            log.info("Firebase OTP generation requested for phone: {}", phone);
+            
+            // Return OTP in dev mode only
+            String message = "OTP sent to your phone via Firebase";
+            return new OtpResponse(message, otp); // OTP for development
+        } else {
+            // Email-based OTP (existing flow)
+            String otp = otpService.generateAndStoreOtp(identifier);
+            
+            log.info("OTP generation requested for email: {}", identifier);
+            
+            String message = otp != null 
+                ? "OTP sent successfully (Development Mode)" 
+                : "OTP sent successfully. Please check your email.";
+            
+            return new OtpResponse(message, otp);
         }
-        
-        // OTP will be null in production (based on otp.return-in-response property)
-        String message = otp != null 
-            ? "OTP sent successfully (Development Mode)" 
-            : "OTP sent successfully. Please check your email/SMS.";
-        
-        return new OtpResponse(message, otp);
     }
 
     /**
@@ -64,20 +77,43 @@ public class AuthService {
         String identifier = request.getIdentifier();
         String otp = request.getOtp();
 
-        // Verify OTP
-        if (!otpService.verifyOtp(identifier, otp)) {
-            throw new BadCredentialsException("Invalid or expired OTP");
-        }
-
-        // Find or create user
-        User user = findOrCreateUser(identifier);
-
-        // Generate JWT token
-        String token = jwtService.generateToken(user.getId(), user.getRole().name());
-
-        log.info("User authenticated successfully: {}", user.getId());
+        // Check if it's a phone number (use Firebase)
+        boolean isPhone = identifier.startsWith("+") || identifier.matches("^\\d{10,}$");
         
-        return new AuthResponse(token, user.getRole().name(), user.getId(), "Authentication successful");
+        if (isPhone) {
+            // Normalize phone to E.164 format if needed
+            String phone = identifier.startsWith("+") ? identifier : "+91" + identifier;
+            
+            // Verify OTP using Firebase
+            if (!firebaseOtpService.verifyOtp(phone, otp)) {
+                throw new BadCredentialsException("Invalid or expired OTP");
+            }
+            
+            // Find or create user with phone
+            User user = findOrCreateUser(phone);
+            
+            // Generate JWT token
+            String token = jwtService.generateToken(user.getId(), user.getRole().name());
+            
+            log.info("User authenticated successfully via Firebase: {}", user.getId());
+            
+            return new AuthResponse(token, user.getRole().name(), user.getId(), "Authentication successful");
+        } else {
+            // Email-based OTP verification (existing flow)
+            if (!otpService.verifyOtp(identifier, otp)) {
+                throw new BadCredentialsException("Invalid or expired OTP");
+            }
+            
+            // Find or create user with email
+            User user = findOrCreateUser(identifier);
+            
+            // Generate JWT token
+            String token = jwtService.generateToken(user.getId(), user.getRole().name());
+            
+            log.info("User authenticated successfully: {}", user.getId());
+            
+            return new AuthResponse(token, user.getRole().name(), user.getId(), "Authentication successful");
+        }
     }
 
     /**

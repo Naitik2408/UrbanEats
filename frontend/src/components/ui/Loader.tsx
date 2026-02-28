@@ -21,7 +21,7 @@ export const Loader: React.FC<LoaderProps> = ({ size = 'md', centered = true }) 
   const spinner = (
     <div className="inline-block" role="status" aria-label="Loading">
       <svg
-        className={`animate-spin text-blue-600 ${sizeClasses[size]}`}
+        className={`animate-spin text-red-600 ${sizeClasses[size]}`}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

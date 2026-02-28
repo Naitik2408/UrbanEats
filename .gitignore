@@ -64,3 +64,4 @@ application-*.yml
 *.md
 .agents
 *.sh
+firebase-service-account.json

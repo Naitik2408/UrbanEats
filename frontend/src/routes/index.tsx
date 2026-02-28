@@ -8,8 +8,14 @@ import { ProtectedRoute } from './ProtectedRoute';
 const LandingPage = lazy(() =>
   import('../pages/LandingPage').then((m) => ({ default: m.LandingPage }))
 );
-const AuthPage = lazy(() =>
-  import('../pages/AuthPage').then((m) => ({ default: m.AuthPage }))
+const CustomerLoginPage = lazy(() =>
+  import('../pages/auth/CustomerLoginPage')
+);
+const OtpVerificationPage = lazy(() =>
+  import('../pages/auth/OtpVerificationPage')
+);
+const AdminLoginPage = lazy(() =>
+  import('../pages/auth/AdminLoginPage')
 );
 const AdminDashboard = lazy(() =>
   import('../pages/AdminDashboard').then((m) => ({ default: m.AdminDashboard }))
@@ -80,10 +86,26 @@ const router = createBrowserRouter([
     element: <AuthLayout />,
     children: [
       {
-        index: true,
+        path: 'customer-login',
         element: (
           <Suspense fallback={<Loader />}>
-            <AuthPage />
+            <CustomerLoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'verify-otp',
+        element: (
+          <Suspense fallback={<Loader />}>
+            <OtpVerificationPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'admin-login',
+        element: (
+          <Suspense fallback={<Loader />}>
+            <AdminLoginPage />
           </Suspense>
         ),
       },
