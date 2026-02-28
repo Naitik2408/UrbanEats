@@ -94,7 +94,8 @@ export const verifyOtpViaFirebase = async (otp: string): Promise<string> => {
     // Get ID token
     const idToken = await result.user.getIdToken();
     
-    console.log('OTP verified successfully');
+    console.log('✅ [Firebase Auth] OTP verified successfully');
+    console.log('🔑 [Firebase Auth] Firebase ID token obtained:', idToken.substring(0, 20) + '...');
     
     // Clear confirmation result
     confirmationResult = null;

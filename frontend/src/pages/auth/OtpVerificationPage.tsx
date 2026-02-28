@@ -35,8 +35,15 @@ export default function OtpVerificationPage() {
 
   const mutation = useMutation({
     mutationFn: async (otpString: string) => {
+      console.log('🔄 [OTP Verification] Starting verification flow...');
+      console.log('📱 [OTP Verification] Phone:', identifier);
+      console.log('🔢 [OTP Verification] OTP:', otpString);
+      
       // Verify OTP using Firebase
       const firebaseIdToken = await verifyOtpViaFirebase(otpString);
+      
+      console.log('🔑 [OTP Verification] Firebase token received');
+      console.log('📤 [OTP Verification] Sending to backend...');
       
       // Exchange Firebase token for our JWT token
       const response = await verifyOtp({
@@ -45,16 +52,23 @@ export default function OtpVerificationPage() {
         firebaseToken: firebaseIdToken, // Send Firebase token to backend
       });
       
+      console.log('✅ [OTP Verification] Backend response:', response);
+      
       return response;
     },
     onSuccess: (data) => {
+      console.log('🎉 [OTP Verification] Success! Token:', data.token?.substring(0, 20) + '...');
+      console.log('👤 [OTP Verification] Role:', data.role);
+      
       // Save token and set role
       setToken(data.token, 'CUSTOMER');
       
       // Redirect to customer dashboard
+      console.log('🚀 [OTP Verification] Redirecting to /customer...');
       navigate('/customer', { replace: true });
     },
     onError: (err: any) => {
+      console.error('❌ [OTP Verification] Error:', err);
       setError(err.message || 'Invalid OTP. Please try again.');
     },
   });
@@ -112,7 +126,7 @@ export default function OtpVerificationPage() {
   const isOtpComplete = otp.every((digit) => digit !== '');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 px-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Header */}

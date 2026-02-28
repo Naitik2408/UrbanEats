@@ -18,4 +18,10 @@ public class OtpVerifyRequest {
 
     @NotBlank(message = "OTP is required")
     private String otp;
+    
+    /**
+     * Optional Firebase ID token for phone authentication.
+     * When provided, backend will verify this token instead of OTP.
+     */
+    private String firebaseToken;
 }

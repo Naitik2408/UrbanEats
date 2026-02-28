@@ -6,7 +6,7 @@
 export const API_ENDPOINTS = {
   // Authentication
   AUTH: {
-    ADMIN_LOGIN: '/api/auth/login',
+    ADMIN_LOGIN: '/api/auth/admin/login',
     REQUEST_OTP: '/api/auth/request-otp',
     VERIFY_OTP: '/api/auth/verify-otp',
   },

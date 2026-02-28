@@ -47,4 +47,63 @@ export interface AdminLoginRequest {
 
 export interface AuthResponse {
   token: string;
+  role?: string;
+  userId?: number;
+  message?: string;
+}
+
+/**
+ * Pagination types
+ */
+export interface PaginationParams {
+  page?: number;
+  size?: number;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
+/**
+ * Customer browsing types
+ */
+export interface City {
+  id: string;
+  name: string;
+  state: string;
+  country: string;
+}
+
+export interface Restaurant {
+  id: string;
+  name: string;
+  address: string;
+  landmark: string;
+  cityId: string;
+  rating: number;
+  isActive: boolean;
+}
+
+export interface Item {
+  id: string;
+  name: string;
+  description: string;
+  basePrice: number;
+  restaurantId: string;
+  categoryId: string;
+  isAvailable: boolean;
+  hasVariants: boolean;
+  hasAddons: boolean;
+}
+
+/**
+ * Search params
+ */
+export interface SearchParams extends PaginationParams {
+  q: string;
 }

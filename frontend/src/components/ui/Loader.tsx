@@ -46,7 +46,7 @@ export const Loader: React.FC<LoaderProps> = ({ size = 'md', centered = true }) 
 
   if (centered) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex items-center justify-center min-h-50">
         {spinner}
       </div>
     );

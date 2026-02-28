@@ -76,6 +76,7 @@ public class AuthService {
     public AuthResponse verifyOtp(OtpVerifyRequest request) {
         String identifier = request.getIdentifier();
         String otp = request.getOtp();
+        String firebaseToken = request.getFirebaseToken();
 
         // Check if it's a phone number (use Firebase)
         boolean isPhone = identifier.startsWith("+") || identifier.matches("^\\d{10,}$");
@@ -84,20 +85,47 @@ public class AuthService {
             // Normalize phone to E.164 format if needed
             String phone = identifier.startsWith("+") ? identifier : "+91" + identifier;
             
-            // Verify OTP using Firebase
-            if (!firebaseOtpService.verifyOtp(phone, otp)) {
-                throw new BadCredentialsException("Invalid or expired OTP");
+            // If Firebase token is provided, verify it instead of OTP
+            if (firebaseToken != null && !firebaseToken.isEmpty()) {
+                try {
+                    log.info("Verifying Firebase token for phone: {}", phone);
+                    log.debug("Firebase token length: {}", firebaseToken.length());
+                    
+                    // Verify Firebase ID token
+                    String phoneFromToken = firebaseOtpService.verifyFirebaseToken(firebaseToken);
+                    
+                    log.info("Firebase token verified successfully for phone: {}", phoneFromToken);
+                    
+                    // Find or create user with phone
+                    User user = findOrCreateUser(phone);
+                    
+                    // Generate JWT token
+                    String token = jwtService.generateToken(user.getId(), user.getRole().name());
+                    
+                    log.info("User authenticated successfully via Firebase: {}", user.getId());
+                    
+                    return new AuthResponse(token, user.getRole().name(), user.getId(), "Authentication successful");
+                    
+                } catch (Exception e) {
+                    log.error("Firebase token verification failed: {}", e.getMessage());
+                    throw new BadCredentialsException("Invalid Firebase authentication token");
+                }
+            } else {
+                // Fallback to backend OTP verification
+                if (!firebaseOtpService.verifyOtp(phone, otp)) {
+                    throw new BadCredentialsException("Invalid or expired OTP");
+                }
+                
+                // Find or create user with phone
+                User user = findOrCreateUser(phone);
+                
+                // Generate JWT token
+                String token = jwtService.generateToken(user.getId(), user.getRole().name());
+                
+                log.info("User authenticated successfully via Firebase: {}", user.getId());
+                
+                return new AuthResponse(token, user.getRole().name(), user.getId(), "Authentication successful");
             }
-            
-            // Find or create user with phone
-            User user = findOrCreateUser(phone);
-            
-            // Generate JWT token
-            String token = jwtService.generateToken(user.getId(), user.getRole().name());
-            
-            log.info("User authenticated successfully via Firebase: {}", user.getId());
-            
-            return new AuthResponse(token, user.getRole().name(), user.getId(), "Authentication successful");
         } else {
             // Email-based OTP verification (existing flow)
             if (!otpService.verifyOtp(identifier, otp)) {

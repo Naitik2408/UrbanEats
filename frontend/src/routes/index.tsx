@@ -25,6 +25,15 @@ const CustomerDashboard = lazy(() =>
     default: m.CustomerDashboard,
   }))
 );
+const CitySelectionPage = lazy(() =>
+  import('../pages/customer/CitySelectionPage')
+);
+const RestaurantListPage = lazy(() =>
+  import('../pages/customer/RestaurantListPage')
+);
+const ItemListPage = lazy(() =>
+  import('../pages/customer/ItemListPage')
+);
 const NotFoundPage = lazy(() =>
   import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
@@ -74,6 +83,30 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<Loader />}>
                 <CustomerDashboard />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'cities',
+            element: (
+              <Suspense fallback={<Loader />}>
+                <CitySelectionPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'restaurants',
+            element: (
+              <Suspense fallback={<Loader />}>
+                <RestaurantListPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'items',
+            element: (
+              <Suspense fallback={<Loader />}>
+                <ItemListPage />
               </Suspense>
             ),
           },
