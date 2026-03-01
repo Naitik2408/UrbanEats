@@ -34,6 +34,15 @@ const RestaurantListPage = lazy(() =>
 const ItemListPage = lazy(() =>
   import('../pages/customer/ItemListPage')
 );
+const CartPage = lazy(() =>
+  import('../pages/customer/CartPage')
+);
+const CheckoutPage = lazy(() =>
+  import('../pages/customer/CheckoutPage')
+);
+const OrdersPage = lazy(() =>
+  import('../pages/customer/OrdersPage')
+);
 const NotFoundPage = lazy(() =>
   import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
@@ -107,6 +116,30 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<Loader />}>
                 <ItemListPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'cart',
+            element: (
+              <Suspense fallback={<Loader />}>
+                <CartPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'checkout',
+            element: (
+              <Suspense fallback={<Loader />}>
+                <CheckoutPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'orders',
+            element: (
+              <Suspense fallback={<Loader />}>
+                <OrdersPage />
               </Suspense>
             ),
           },

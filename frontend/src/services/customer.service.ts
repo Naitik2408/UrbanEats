@@ -1,4 +1,4 @@
-import { apiClient } from './api.service';
+import apiClient from '../api/axios';
 import type {
   City,
   Restaurant,
@@ -16,15 +16,13 @@ import type {
  */
 
 /**
- * Fetch paginated list of cities
+ * Fetch all cities
+ * Note: Backend returns full list (no pagination) as city list is typically small
  */
 export const fetchCities = async (
   params: PaginationParams = {}
-): Promise<PageResponse<City>> => {
-  const { page = 0, size = 10 } = params;
-  const response = await apiClient.get<PageResponse<City>>('/api/customer/cities', {
-    params: { page, size },
-  });
+): Promise<City[]> => {
+  const response = await apiClient.get('/api/customer/cities');
   return response.data;
 };
 
@@ -35,7 +33,7 @@ export const searchCities = async (
   params: SearchParams
 ): Promise<PageResponse<City>> => {
   const { q, page = 0, size = 10 } = params;
-  const response = await apiClient.get<PageResponse<City>>('/api/customer/search/cities', {
+  const response = await apiClient.get('/api/customer/search/cities', {
     params: { q, page, size },
   });
   return response.data;
@@ -49,7 +47,7 @@ export const fetchRestaurants = async (
   params: PaginationParams = {}
 ): Promise<PageResponse<Restaurant>> => {
   const { page = 0, size = 10 } = params;
-  const response = await apiClient.get<PageResponse<Restaurant>>('/api/customer/restaurants', {
+  const response = await apiClient.get('/api/customer/restaurants', {
     params: { cityId, page, size },
   });
   return response.data;
@@ -62,7 +60,7 @@ export const searchRestaurants = async (
   params: SearchParams
 ): Promise<PageResponse<Restaurant>> => {
   const { q, page = 0, size = 10 } = params;
-  const response = await apiClient.get<PageResponse<Restaurant>>('/api/customer/search/restaurants', {
+  const response = await apiClient.get('/api/customer/search/restaurants', {
     params: { q, page, size },
   });
   return response.data;
@@ -76,7 +74,7 @@ export const fetchItems = async (
   params: PaginationParams = {}
 ): Promise<PageResponse<Item>> => {
   const { page = 0, size = 10 } = params;
-  const response = await apiClient.get<PageResponse<Item>>('/api/customer/items', {
+  const response = await apiClient.get('/api/customer/items', {
     params: { restaurantId, page, size },
   });
   return response.data;
@@ -89,7 +87,7 @@ export const searchItems = async (
   params: SearchParams
 ): Promise<PageResponse<Item>> => {
   const { q, page = 0, size = 10 } = params;
-  const response = await apiClient.get<PageResponse<Item>>('/api/customer/search/items', {
+  const response = await apiClient.get('/api/customer/search/items', {
     params: { q, page, size },
   });
   return response.data;

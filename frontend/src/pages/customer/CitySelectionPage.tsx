@@ -32,7 +32,7 @@ export default function CitySelectionPage() {
     queryFn: () =>
       debouncedSearch
         ? searchCities({ q: debouncedSearch, page, size: 12 })
-        : fetchCities({ page, size: 12 }),
+        : fetchCities(),
   });
 
   const handleCityClick = (cityId: string) => {
@@ -41,7 +41,7 @@ export default function CitySelectionPage() {
   };
 
   const handleNextPage = () => {
-    if (data && !data.last) {
+    if (data && 'last' in data && !data.last) {
       setPage((prev) => prev + 1);
     }
   };
@@ -51,6 +51,11 @@ export default function CitySelectionPage() {
       setPage((prev) => prev - 1);
     }
   };
+
+  // Determine if data is array (full list) or PageResponse (search results)
+  const isArrayData = Array.isArray(data);
+  const cities = isArrayData ? data : data?.content || [];
+  const hasData = cities.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -98,9 +103,9 @@ export default function CitySelectionPage() {
         )}
 
         {/* City Grid */}
-        {!isLoading && data && data.content.length > 0 && (
+        {!isLoading && hasData && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {data.content.map((city) => (
+            {cities.map((city) => (
               <Card
                 key={city.id}
                 className="cursor-pointer hover:shadow-lg hover:border-red-600 transition-all duration-200 group"
@@ -136,7 +141,7 @@ export default function CitySelectionPage() {
         )}
 
         {/* Empty State */}
-        {!isLoading && data && data.content.length === 0 && (
+        {!isLoading && data && !hasData && (
           <div className="text-center py-12">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"
@@ -158,8 +163,8 @@ export default function CitySelectionPage() {
           </div>
         )}
 
-        {/* Pagination */}
-        {!isLoading && data && data.content.length > 0 && (
+        {/* Pagination - Only show for search results (PageResponse) */}
+        {!isLoading && hasData && !isArrayData && (
           <div className="mt-8 flex items-center justify-between border-t border-gray-200 pt-6">
             <div className="text-sm text-gray-700">
               Showing page {page + 1} of {data.totalPages}

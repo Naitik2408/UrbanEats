@@ -56,9 +56,10 @@ export const API_ENDPOINTS = {
 
   // Customer - Orders
   ORDERS: {
-    BASE: '/api/customer/orders',
-    BY_ID: (id: number) => `/api/customer/orders/${id}`,
-    CANCEL: (id: number) => `/api/customer/orders/${id}/cancel`,
+    PLACE: '/api/customer/order/place',
+    LIST: '/api/customer/order/s',
+    BY_ID: (id: number) => `/api/customer/order/${id}`,
+    CANCEL: (id: number) => `/api/customer/order/${id}/cancel`,
   },
 
   // Search

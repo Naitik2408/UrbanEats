@@ -60,8 +60,17 @@ export default function OtpVerificationPage() {
       console.log('🎉 [OTP Verification] Success! Token:', data.token?.substring(0, 20) + '...');
       console.log('👤 [OTP Verification] Role:', data.role);
       
+      // Normalize role (backend returns ROLE_CUSTOMER, we need CUSTOMER)
+      const normalizedRole = data.role?.replace('ROLE_', '') as 'CUSTOMER' | 'ADMIN';
+      console.log('🔄 [OTP Verification] Normalized role:', normalizedRole);
+      
       // Save token and set role
-      setToken(data.token, 'CUSTOMER');
+      setToken(data.token, normalizedRole);
+      
+      // Verify token was stored
+      const storedToken = useAuthStore.getState().token;
+      console.log('💾 [OTP Verification] Token stored:', storedToken?.substring(0, 20) + '...');
+      console.log('✅ [OTP Verification] Auth state:', useAuthStore.getState());
       
       // Redirect to customer dashboard
       console.log('🚀 [OTP Verification] Redirecting to /customer...');

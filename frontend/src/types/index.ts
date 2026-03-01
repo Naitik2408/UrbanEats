@@ -3,6 +3,9 @@
  * Matches backend API contracts.
  */
 
+// Re-export cart types
+export * from './cart.types';
+
 // ============================================
 // Authentication Types
 // ============================================

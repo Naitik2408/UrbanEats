@@ -1,5 +1,7 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { ShoppingCart } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { useCartStore } from '../../store/cartStore';
 
 /**
  * Main layout wrapper for authenticated pages.
@@ -12,6 +14,12 @@ import { useAuthStore } from '../../store/authStore';
  */
 export const MainLayout: React.FC = () => {
   const { isAuthenticated, role, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const itemCount = useCartStore((state) => state.itemCount());
+
+  const handleCartClick = () => {
+    navigate('/customer/cart');
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -28,6 +36,22 @@ export const MainLayout: React.FC = () => {
             <nav className="flex items-center gap-6">
               {isAuthenticated ? (
                 <>
+                  {/* Cart Icon for Customers */}
+                  {role === 'CUSTOMER' && (
+                    <button
+                      onClick={handleCartClick}
+                      className="relative p-2 text-gray-700 hover:text-orange-600 transition-colors"
+                      aria-label="Shopping Cart"
+                    >
+                      <ShoppingCart className="w-6 h-6" />
+                      {itemCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {itemCount > 9 ? '9+' : itemCount}
+                        </span>
+                      )}
+                    </button>
+                  )}
+                  
                   <span className="text-sm text-gray-600">
                     Role: <span className="font-medium">{role}</span>
                   </span>
@@ -40,12 +64,20 @@ export const MainLayout: React.FC = () => {
                     </Link>
                   )}
                   {role === 'CUSTOMER' && (
-                    <Link
-                      to="/customer"
-                      className="text-gray-700 hover:text-blue-600 transition-colors"
-                    >
-                      My Orders
-                    </Link>
+                    <>
+                      <Link
+                        to="/customer/orders"
+                        className="text-gray-700 hover:text-blue-600 transition-colors"
+                      >
+                        My Orders
+                      </Link>
+                      <Link
+                        to="/customer/cities"
+                        className="text-gray-700 hover:text-blue-600 transition-colors"
+                      >
+                        Browse
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={logout}

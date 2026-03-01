@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchItems, searchItems } from '@/services/customer.service';
+import { fetchItemDetails } from '@/services/order.service';
+import { useCartStore } from '@/store/cartStore';
+import { useToastStore } from '@/store/toastStore';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useDebounce } from '@/hooks/useDebounce';
+import AddToCartModal from '@/components/cart/AddToCartModal';
+import type { CartItem } from '@/store/cartStore';
 
 /**
  * Item List Page
@@ -28,6 +33,13 @@ export default function ItemListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 300);
 
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Cart store
+  const addItem = useCartStore((state) => state.addItem);
+  const addToast = useToastStore((state) => state.addToast);
+
   // Redirect if no restaurant selected
   useEffect(() => {
     if (!restaurantId) {
@@ -47,6 +59,32 @@ export default function ItemListPage() {
     },
     enabled: !!restaurantId,
   });
+
+  // Fetch item details for modal
+  const itemDetailsMutation = useMutation({
+    mutationFn: (itemId: number) => fetchItemDetails(itemId),
+    onSuccess: () => {
+      setIsModalOpen(true);
+    },
+    onError: (error) => {
+      console.error('Failed to fetch item details:', error);
+      addToast('Failed to load item details. Please try again.', 'error');
+    },
+  });
+
+  const handleItemClick = (itemId: number) => {
+    itemDetailsMutation.mutate(itemId);
+  };
+
+  const handleAddToCart = (cartItem: CartItem) => {
+    addItem(cartItem);
+    setIsModalOpen(false);
+    addToast('Item added to cart!', 'success');
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   const handleBackToRestaurants = () => {
     navigate('/customer/restaurants');
@@ -221,9 +259,12 @@ export default function ItemListPage() {
                           variant="outline"
                           size="sm"
                           className="border-red-600 text-red-600 hover:bg-red-50"
-                          disabled
+                          onClick={() => handleItemClick(Number(item.id))}
+                          disabled={itemDetailsMutation.isPending}
                         >
-                          View
+                          {itemDetailsMutation.isPending && itemDetailsMutation.variables === Number(item.id)
+                            ? 'Loading...'
+                            : 'Add to Cart'}
                         </Button>
                       )}
                     </div>
@@ -288,6 +329,16 @@ export default function ItemListPage() {
           </div>
         )}
       </div>
+
+      {/* Add to Cart Modal */}
+      {itemDetailsMutation.data && (
+        <AddToCartModal
+          item={itemDetailsMutation.data}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onAddToCart={handleAddToCart}
+        />
+      )}
     </div>
   );
 }
