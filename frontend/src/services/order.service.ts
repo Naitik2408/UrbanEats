@@ -1,6 +1,7 @@
 import apiClient from '../api/axios';
 import { API_ENDPOINTS } from '../api/endpoints';
 import type { ItemDetails, PlaceOrderRequest, Order } from '../types/cart.types';
+import type { PageResponse } from '../types/api.types';
 
 /**
  * Order service for customer order operations
@@ -23,12 +24,13 @@ export const placeOrder = async (orderData: PlaceOrderRequest): Promise<Order> =
 };
 
 /**
- * Fetch all orders for the authenticated user
+ * Fetch paginated orders for the authenticated user
  */
-export const fetchOrders = async (): Promise<Order[]> => {
-  const response = await apiClient.get(API_ENDPOINTS.ORDERS.LIST);
-  // Backend returns Page<OrderResponse>, extract content array
-  return response.data.content || [];
+export const fetchOrders = async (page: number = 0, size: number = 10): Promise<PageResponse<Order>> => {
+  const response = await apiClient.get(API_ENDPOINTS.ORDERS.LIST, {
+    params: { page, size, sort: 'createdAt,desc' }
+  });
+  return response.data;
 };
 
 /**
